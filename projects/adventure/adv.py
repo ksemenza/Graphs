@@ -26,9 +26,6 @@ world.print_rooms()
 
 player = Player(world.starting_room)
 
-# Fill this out with directions to walk
-# traversal_path = ['n', 'n']
-
 
 class ExploreRooms:
     def __init__(self, world: World):
@@ -36,8 +33,8 @@ class ExploreRooms:
         self.start = self.world.starting_room
         self.path = []
 
-#group utility function to class 
-#staticMethod() 
+# group utility function to class
+# staticMethod()
     @ staticmethod
     def get_neighbors(room: Room):
         neighbors = []
@@ -62,14 +59,14 @@ class ExploreRooms:
             path = stack.pop()
             rm = path[-1][0]
 
-            #checks if it has been explored 
+            # checks if it has been explored
             if rm.id not in visited:
                 visited.add(rm.id)
 
-                # If all of the neighboring rooms are on this path 
-                # this is a dead end 
+                # If all of the neighboring rooms are on this path
+                # this is a dead end
                 # return the path to this room
-                
+
                 neighbors = self.get_neighbors(rm)
                 if all([neighbor_room.id in [path_room.id for path_room, _ in path]
                         for neighbor_room, _ in neighbors]):
@@ -91,7 +88,7 @@ class ExploreRooms:
         queue.append(path)
 
         while queue:
-            # Get a candidate path and the last room in it.
+            # Get a candidate path and the last room user was in.
             path = queue.popleft()
             rm = path[-1][0]
 
@@ -106,33 +103,36 @@ class ExploreRooms:
                     # The start of this path is already a part of the main path.
                     return path[1:]
 
-                # Otherwise, continue looking for a room with an unexplored neighbor.
+                # Otherwise, continue looking for a room with an unexplored neighbors.
                 for neighbor in neighbors:
                     new_path = [*path, neighbor]
                     queue.append(new_path)
 
     def explore_paths(self):
- 
+
         print('Finding path...')
         # Initialize path with a tuple (starting room, empty string)
-        self.path = [(self.start, '')] 
+        self.path = [(self.start, '')]
 
-        while True:  # 6.
+        # loop
+        while True:
             # Create a new reference for this loop
             main_path = self.path.copy()
-            # no explored paths
-            dft_path = self.DFT(main_path[-1])  
-            #append path to path list
-            main_path = [*main_path, *dft_path]  
+            # use DFT to a room with no more neighors available
+            dft_path = self.DFT(main_path[-1])
+            # append path to path list
+            main_path = [*main_path, *dft_path]
             # Update for BFT
             self.path = main_path
-            bft_path = self.BFT(main_path[-1])  # 4.
+            # use BFT to go back to closest room with unexplored neighbor
+            bft_path = self.BFT(main_path[-1])
 
             # If BFT finds no unexplored rooms, the graph has been traversed.
             if not bft_path:
-                return [direction for _, direction in self.path[1:]]  # 7.
-
-            main_path = [*main_path, *bft_path]  # 5.
+                # return path
+                return [direction for _, direction in self.path[1:]]
+            # append path to main path
+            main_path = [*main_path, *bft_path]
             # Update for next loop.
             self.path = main_path
 
